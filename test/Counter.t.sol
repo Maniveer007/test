@@ -1,24 +1,16 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+import {GmpTestTools} from "@analog-gmp-testing/GmpTestTools.sol";
 
-import {Test, console} from "forge-std/Test.sol";
-import {Counter} from "../src/Counter.sol";
+// Deploy gateway contracts and create forks for all supported networks
+GmpTestTools.setup();
 
-contract CounterTest is Test {
-    Counter public counter;
+// Set `account` balance in all networks
+GmpTestTools.deal(address(account), 100 ether);
 
-    function setUp() public {
-        counter = new Counter();
-        counter.setNumber(0);
-    }
+// Switch to Sepolia network
+GmpTestTools.switchNetwork(5);
 
-    function test_Increment() public {
-        counter.increment();
-        assertEq(counter.number(), 1);
-    }
+// Switch to Shibuya network and set `account` as `msg.sender` and `tx.origin`
+GmpTestTools.switchNetwork(7, address(account));
 
-    function testFuzz_SetNumber(uint256 x) public {
-        counter.setNumber(x);
-        assertEq(counter.number(), x);
-    }
-}
+// Relay all pending GMP messages.
+GmpTestTools.relayMessages();
